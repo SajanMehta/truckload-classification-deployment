@@ -43,6 +43,14 @@ def model_pipeline(image: Image.Image) -> int:
     predicted_class = tf.argmax(output, axis=1).numpy()[0]
     return int(predicted_class)
 
+label_map = {
+    0: "Empty Trailer",
+    1: "Quarter Full",
+    2: "3-Quarter Full",
+    3: "Full",
+    4: "Not A Trailer"
+}
+
 @app.get("/health")
 def health():
     model = app.state.model
@@ -80,4 +88,4 @@ async def predict_image(image: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=f"Failed to process image: {str(e)}")
 
     predicted_class = model_pipeline(pil)
-    return {"predicted_class": int(predicted_class), "model_input_shape": app.state.model.input_shape}
+    return {"predicted_class": label_map[int(predicted_class)]}
