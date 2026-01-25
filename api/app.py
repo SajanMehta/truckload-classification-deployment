@@ -7,16 +7,24 @@ from typing import Union
 import keras
 import tensorflow as tf
 import mlflow
+import os
 
 
 #link = "https://tisstorageproduction.blob.core.windows.net/tis-blobstorage-prod/98868187-187-0.jpg"
 
 #model = keras.models.load_model("models/my_model.keras", compile=False)
 
-mlflow.set_tracking_uri("https://unworthy-nonrepaying-bunny.ngrok-free.dev")
+MLFLOW_TRACKING_USERNAME = os.getenv("MLFLOW_TRACKING_USERNAME")
+MLFLOW_TRACKING_PASSWORD = os.getenv("MLFLOW_TRACKING_PASSWORD")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
+CURRENT_MODEL_NAME = os.getenv("CURRENT_MODEL_NAME")
 
-run_id = "16691f727f8f41108f901af1a7f7b57a"
-model_uri = f"runs:/{run_id}/model"
+URI = f"https://{MLFLOW_TRACKING_USERNAME}:{MLFLOW_TRACKING_PASSWORD}@{MLFLOW_TRACKING_URI}"
+
+
+mlflow.set_tracking_uri(URI)
+
+model_uri = f"models:/{CURRENT_MODEL_NAME}/1"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
