@@ -2,7 +2,9 @@ import gradio as gr
 import requests
 import io
 
-API_URL = "http://localhost:8000/predict-image"
+API_URL = "https://truckload-classification-deployment.railway.internal:8080/predict-image"
+
+print("Calling API at: ", API_URL)
 
 def predict(image):
     buf = io.BytesIO()
