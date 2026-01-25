@@ -2,7 +2,7 @@ import gradio as gr
 import requests
 import io
 
-API_URL = "https://truckload-classification-deployment.railway.internal:8080/predict-image"
+API_URL = "http://truckload-classification-deployment.railway.internal:8080/predict-image"
 
 print("Calling API at: ", API_URL)
 
