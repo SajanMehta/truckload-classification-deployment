@@ -73,6 +73,7 @@ def read_root():
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 
+# Link method
 # @app.get("/predict/")
 # def predict_image():
 #     response = requests.get(link)
