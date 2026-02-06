@@ -22,6 +22,9 @@ MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
 CURRENT_MODEL_NAME = os.getenv("CURRENT_MODEL_NAME")
 CURRENT_MODEL_VERSION = os.getenv("CURRENT_MODEL_VERSION")
 
+REQUIRED_NO_TRAILERS = os.getenv("REQUIRED_NO_TRAILERS")
+REQUIRED_DISTINCT_TRAILER_CLASSES = os.getenv("REQUIRED_DISTINCT_TRAILER_CLASSES")
+
 URI = f"https://{MLFLOW_TRACKING_USERNAME}:{MLFLOW_TRACKING_PASSWORD}@{MLFLOW_TRACKING_URI}"
 
 
@@ -120,9 +123,9 @@ async def predict_csv(file: UploadFile = File(...)):
     no_trailers = sum(trailers.values())
 
     if no_distinct_trailer_classes >= 2 and no_trailers >= 4:
-        return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df.columns.tolist()}
+        return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df["manifest_image"].tolist()}
     else:
-        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df.columns.tolist()}
+        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df["manifest_image"].tolist()}
     
 @app.post("/predict-image")
 async def predict_image(image: UploadFile = File(...)):
