@@ -122,7 +122,7 @@ async def predict_csv(file: UploadFile = File(...)):
     no_distinct_trailer_classes = len(trailers.keys())
     no_trailers = sum(trailers.values())
 
-    if no_distinct_trailer_classes >= 2 and no_trailers >= 4:
+    if no_distinct_trailer_classes >= REQUIRED_DISTINCT_TRAILER_CLASSES and no_trailers >= REQUIRED_NO_TRAILERS:
         return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df["manifest_image"].tolist()}
     else:
         return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df["manifest_image"].tolist()}
