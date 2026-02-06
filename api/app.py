@@ -96,7 +96,7 @@ async def predict_csv(file: UploadFile = File(...)):
 
     # Complete import and read in the content to pandas    
     try:
-        df= pd.read_csv(BytesIO(content))
+        df = pd.read_csv(BytesIO(content))
 
 
     except Exception as e:
@@ -119,9 +119,9 @@ async def predict_csv(file: UploadFile = File(...)):
     no_trailers = sum(trailers.values())
 
     if no_distinct_trailer_classes >= 2 and no_trailers >= 4:
-        return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df}
+        return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df.columns.tolist()}
     else:
-        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df}
+        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df.columns.tolist()}
     
 @app.post("/predict-image")
 async def predict_image(image: UploadFile = File(...)):
