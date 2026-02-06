@@ -21,7 +21,7 @@ def predict_csv(file):
     files = {"file": ("data.csv", file, "text/csv")}
     r = requests.post(API_URL_CSV, files = files, timeout = 300)
     r.raise_for_status()
-    return r.json
+    return r.json()
 
 # demo = gr.Interface(
 #     fn=predict_image,
