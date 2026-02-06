@@ -8,6 +8,7 @@ import keras
 import tensorflow as tf
 import mlflow
 import os
+import pandas as pd
 
 
 #link = "https://tisstorageproduction.blob.core.windows.net/tis-blobstorage-prod/98868187-187-0.jpg"
@@ -83,6 +84,44 @@ def read_item(item_id: int, q: Union[str, None] = None):
 #     output = model.predict(preprocessed_image)
 #     predicted_class = tf.argmax(output, axis=1).numpy()[0]
 #     return {"predicted_class": int(predicted_class), "model_input_shape": model.input_shape}
+
+@app.post("/predict-csv")
+async def predict_csv(file: UploadFile = File(...)):
+    # Handling poor upload
+    if file.content_type != "text/csv":
+        raise HTTPException(status_code=415, detail=f"Unsupported content type: {file.content_type}")
+    
+    # Read the file
+    content = await file.read()
+
+    # Complete import and read in the content to pandas    
+    try:
+        df= pd.read_csv(BytesIO(content))
+
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to process CSV file: {str(e)}")
+    
+    trailers = {}
+
+    for _, row in df.iterrows():
+        link = row["manifest_image"]
+        response = requests.get(link)
+        response.raise_for_status()
+        img = Image.open(BytesIO(response.content))
+        predicted_class = model_pipeline(img)
+        if predicted_class in trailers.keys() and trailers[predicted_class]>0:
+            trailers[predicted_class] += 1
+        else:
+            trailers[predicted_class] = 1
+
+    no_distinct_trailer_classes = len(trailers.keys())
+    no_trailers = sum(trailers.values())
+
+    if no_distinct_trailer_classes >= 2 and no_trailers >= 4:
+        return {"manifest_prediction": "This manifest is predicted to have the correct items"}
+    else:
+        return {"manifest_prediction": "This manifest is predicted to have incorrect items"}
     
 @app.post("/predict-image")
 async def predict_image(image: UploadFile = File(...)):
