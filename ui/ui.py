@@ -45,7 +45,7 @@ with gr.Blocks() as demo:
             gr.Markdown("### CSV Manifest Prediction")
             csv_in = gr.File(label="Upload a CSV", file_types=[".csv"])
             csv_btn = gr.Button("Run CSV")
-            csv_out = gr.Dataframe(label="CSV result")
+            csv_out = gr.Textbox(label="CSV result")
             csv_btn.click(fn=predict_csv, inputs=csv_in, outputs=csv_out)
 
 if __name__ == "__main__":
