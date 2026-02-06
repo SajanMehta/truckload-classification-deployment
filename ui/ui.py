@@ -18,8 +18,9 @@ def predict_image(image):
     return r.json()
 
 def predict_csv(file):
-    files = {"file": ("data.csv", file, "text/csv")}
-    r = requests.post(API_URL_CSV, files = files, timeout = 300)
+    with open(file.name, "rb") as f:
+        files = {"file": ("data.csv", f, "text/csv")}
+        r = requests.post(API_URL_CSV, files=files, timeout=300)
     r.raise_for_status()
     return r.json()
 
@@ -45,7 +46,7 @@ with gr.Blocks() as demo:
             gr.Markdown("### CSV Manifest Prediction")
             csv_in = gr.File(label="Upload a CSV", file_types=[".csv"])
             csv_btn = gr.Button("Run CSV")
-            csv_out = gr.Textbox(label="CSV result")
+            csv_out = gr.JSON(label="CSV result")
             csv_btn.click(fn=predict_csv, inputs=csv_in, outputs=csv_out)
 
 if __name__ == "__main__":
