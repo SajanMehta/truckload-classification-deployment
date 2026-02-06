@@ -121,7 +121,7 @@ async def predict_csv(file: UploadFile = File(...)):
     if no_distinct_trailer_classes >= 2 and no_trailers >= 4:
         return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df["manifest_image"].tolist()}
     else:
-        return {"manifest_prediction": "This manifest is predicted to have incorrect items"}
+        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df["manifest_image"].tolist()}
     
 @app.post("/predict-image")
 async def predict_image(image: UploadFile = File(...)):
