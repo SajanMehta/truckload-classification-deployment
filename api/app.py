@@ -4,6 +4,7 @@ from PIL import Image
 from io import BytesIO
 from typing import Union
 #import tensorflow.keras as keras
+import requests
 import keras
 import tensorflow as tf
 import mlflow
