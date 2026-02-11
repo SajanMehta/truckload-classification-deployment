@@ -107,13 +107,14 @@ async def predict_csv(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=f"Failed to process CSV file: {str(e)}")
     
     trailers = {}
-
+    dispositions = []
     for _, row in df.iterrows():
         link = row["manifest_image"]
         response = requests.get(link)
         response.raise_for_status()
         img = Image.open(BytesIO(response.content))
         predicted_class = model_pipeline(img)
+        dispositions.append(label_map[int(predicted_class)])
         if predicted_class in trailers.keys() and trailers[predicted_class]>0:
             trailers[predicted_class] += 1
         else:
@@ -121,11 +122,12 @@ async def predict_csv(file: UploadFile = File(...)):
 
     no_distinct_trailer_classes = len(trailers.keys())
     no_trailers = sum(trailers.values())
+    df['Prediction'] = dispositions
 
     if no_distinct_trailer_classes >= REQUIRED_DISTINCT_TRAILER_CLASSES and no_trailers >= REQUIRED_NO_TRAILERS:
-        return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df["manifest_image"]}
+        return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df[["manifest_image", "Prediction"]]}
     else:
-        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df["manifest_image"]}
+        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df[["manifest_image", "Prediction"]]}
     
 @app.post("/predict-image")
 async def predict_image(image: UploadFile = File(...)):
