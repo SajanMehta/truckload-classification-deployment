@@ -55,7 +55,7 @@ with gr.Blocks() as demo:
             csv_in = gr.File(label="Upload a CSV", file_types=[".csv"])
             csv_btn = gr.Button("Run CSV")
             csv_out = gr.JSON(label="CSV result")
-            csv_gallery = gr.Gallery(label="CSV Gallery").style(grid=[2], height="auto")
+            csv_gallery = gr.Gallery(label="CSV Gallery", columns=2, show_label=False)
             csv_btn.click(fn=predict_csv, inputs=csv_in, outputs=[csv_out, csv_gallery])
 
 
