@@ -31,13 +31,20 @@ def predict_csv(file):
     data = r.json()
 
     # 1) Output for gr.JSON (show raw backend response)
-    json_out = data
+    pred_text = data.get("manifest_prediction", "Unknown")
+
+    # Decide green vs red (adjust this condition to match your exact strings)
+    is_good = "incorrect" in pred_text.lower()
+    score = 0.0 if is_good else 1.0
+
+    # gr.Label expects a dict: {label_text: confidence_score}
+    label_out = {pred_text: score}
 
     # 2) Output for gr.Gallery
     # Gallery wants: [("url1","caption1"), ("url2","caption2"), ...]
     gallery_out = [(item["url"], item.get("caption", "")) for item in data.get("gallery", [])]
 
-    return json_out, gallery_out
+    return label_out, gallery_out
 
 with gr.Blocks() as demo:
     gr.Markdown("## Run an Image request or a CSV manifest request to the API")
@@ -54,7 +61,7 @@ with gr.Blocks() as demo:
             gr.Markdown("### CSV Manifest Prediction")
             csv_in = gr.File(label="Upload a CSV", file_types=[".csv"])
             csv_btn = gr.Button("Run CSV")
-            csv_out = gr.JSON(label="CSV result")
+            csv_out = gr.Label(label="CSV result")
             csv_gallery = gr.Gallery(label="CSV Gallery", columns=2, show_label=False)
             csv_btn.click(fn=predict_csv, inputs=csv_in, outputs=[csv_out, csv_gallery])
 
