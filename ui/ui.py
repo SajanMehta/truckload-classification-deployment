@@ -17,12 +17,27 @@ def predict_image(image):
     r.raise_for_status()
     return r.json()
 
-def predict_csv(file):
+"""def predict_csv(file):
     with open(file.name, "rb") as f:
         files = {"file": ("data.csv", f, "text/csv")}
         r = requests.post(API_URL_CSV, files=files, timeout=300)
     r.raise_for_status()
-    return r.json()
+    return r.json()"""
+
+def predict_csv(file):
+    with open(file.name, "rb") as f:
+        r = requests.post(API_URL_CSV, files={"file": (file.name, f, "text/csv")}, timeout=300)
+    r.raise_for_status()
+    data = r.json()
+
+    # 1) Output for gr.JSON (show raw backend response)
+    json_out = data
+
+    # 2) Output for gr.Gallery
+    # Gallery wants: [("url1","caption1"), ("url2","caption2"), ...]
+    gallery_out = [(item["url"], item.get("caption", "")) for item in data.get("gallery", [])]
+
+    return json_out, gallery_out
 
 with gr.Blocks() as demo:
     gr.Markdown("## Run an Image request or a CSV manifest request to the API")
@@ -40,7 +55,8 @@ with gr.Blocks() as demo:
             csv_in = gr.File(label="Upload a CSV", file_types=[".csv"])
             csv_btn = gr.Button("Run CSV")
             csv_out = gr.JSON(label="CSV result")
-            csv_btn.click(fn=predict_csv, inputs=csv_in, outputs=csv_out)
+            csv_gallery = gr.Gallery(label="CSV Gallery").style(grid=[2], height="auto")
+            csv_btn.click(fn=predict_csv, inputs=csv_in, outputs=[csv_out, csv_gallery])
 
 
 if __name__ == "__main__":
