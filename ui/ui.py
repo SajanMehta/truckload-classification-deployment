@@ -24,13 +24,6 @@ def predict_csv(file):
     r.raise_for_status()
     return r.json()
 
-# demo = gr.Interface(
-#     fn=predict_image,
-#     inputs=gr.Image(type="pil"),
-#     outputs=gr.JSON(),
-#     title="Image Classifier Demo"
-# )
-
 with gr.Blocks() as demo:
     gr.Markdown("## Run an Image request or a CSV manifest request to the API")
 
@@ -49,6 +42,6 @@ with gr.Blocks() as demo:
             csv_out = gr.JSON(label="CSV result")
             csv_btn.click(fn=predict_csv, inputs=csv_in, outputs=csv_out)
 
+
 if __name__ == "__main__":
     demo.launch(server_name="0.0.0.0", server_port=7860)
-

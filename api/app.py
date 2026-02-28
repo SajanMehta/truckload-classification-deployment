@@ -107,6 +107,7 @@ async def predict_csv(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=f"Failed to process CSV file: {str(e)}")
     
     trailers = {}
+    trailer_labels = []
     #dispositions = []
     for _, row in df.iterrows():
         link = row["manifest_image"]
@@ -117,17 +118,23 @@ async def predict_csv(file: UploadFile = File(...)):
         #dispositions.append(label_map[int(predicted_class)])
         if predicted_class in trailers.keys() and trailers[predicted_class]>0:
             trailers[predicted_class] += 1
+            trailer_labels.append(label_map[int(predicted_class)])
         else:
             trailers[predicted_class] = 1
+            trailer_labels.append(label_map[int(predicted_class)])
 
     no_distinct_trailer_classes = len(trailers.keys())
     no_trailers = sum(trailers.values())
     #df['Prediction'] = dispositions
 
+    # Create output for gallery
+    gallery_output = list(zip(df["manifest_image"].to_list(), trailer_labels))
+
+
     if no_distinct_trailer_classes >= REQUIRED_DISTINCT_TRAILER_CLASSES and no_trailers >= REQUIRED_NO_TRAILERS:
-        return {"manifest_prediction": "This manifest is predicted to have the correct items", "links": df["manifest_image"]}
+        return {"manifest_prediction": "This manifest is predicted to have the correct items", "gallery": [{"url": url, "caption": cap} for url, cap in gallery_output]}
     else:
-        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "links": df["manifest_image"]}
+        return {"manifest_prediction": "This manifest is predicted to have incorrect items", "gallery": [{"url": url, "caption": cap} for url, cap in gallery_output]}
     
 @app.post("/predict-image")
 async def predict_image(image: UploadFile = File(...)):
