@@ -7,6 +7,16 @@ API_URL_CSV = "http://truckload-classification-deployment.railway.internal:8080/
 
 print("Calling API at: ", API_URL_IMAGE, API_URL_CSV)
 
+"""def predict_image(image):
+    buf = io.BytesIO()
+    image.save(buf, format="PNG")
+    buf.seek(0)
+
+    files = {"image": ("image.png", buf, "image/png")}
+    r = requests.post(API_URL_IMAGE, files=files, timeout=60)
+    r.raise_for_status()
+    return r.json()"""
+
 def predict_image(image):
     buf = io.BytesIO()
     image.save(buf, format="PNG")
@@ -15,7 +25,13 @@ def predict_image(image):
     files = {"image": ("image.png", buf, "image/png")}
     r = requests.post(API_URL_IMAGE, files=files, timeout=60)
     r.raise_for_status()
-    return r.json()
+    data = r.json()
+
+    prediction = data.get("predicted_class", "Unknown")
+    
+    label_out = {prediction: 1.0}
+
+    return label_out
 
 """def predict_csv(file):
     with open(file.name, "rb") as f:
@@ -54,8 +70,9 @@ with gr.Blocks() as demo:
             gr.Markdown("### Image Prediction")
             img_in = gr.Image(type="pil", label="Upload an image")
             img_btn = gr.Button("Run Image Prediction")
+            img_label = gr.Label(label="Image Prediction Result")
             img_out = gr.Textbox(label="Image Result")
-            img_btn.click(fn=predict_image, inputs=img_in, outputs=img_out)
+            img_btn.click(fn=predict_image, inputs=img_in, outputs=img_label)
 
         with gr.Column():
             gr.Markdown("### CSV Manifest Prediction")
