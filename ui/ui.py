@@ -46,18 +46,15 @@ def predict_csv(file):
     r.raise_for_status()
     data = r.json()
 
-    # 1) Output for gr.JSON (show raw backend response)
+    # 1) Output for gr.JSON
     pred_text = data.get("manifest_prediction", "Unknown")
 
-    # Decide green vs red (adjust this condition to match your exact strings)
     is_good = "incorrect" in pred_text.lower()
     score = 0.0 if is_good else 1.0
 
-    # gr.Label expects a dict: {label_text: confidence_score}
     label_out = {pred_text: score}
 
     # 2) Output for gr.Gallery
-    # Gallery wants: [("url1","caption1"), ("url2","caption2"), ...]
     gallery_out = [(item["url"], item.get("caption", "")) for item in data.get("gallery", [])]
 
     return label_out, gallery_out
@@ -71,7 +68,7 @@ with gr.Blocks() as demo:
             img_in = gr.Image(type="pil", label="Upload an image")
             img_btn = gr.Button("Run Image Prediction")
             img_label = gr.Label(label="Image Prediction Result")
-            img_out = gr.Textbox(label="Image Result")
+            #img_out = gr.Textbox(label="Image Result")
             img_btn.click(fn=predict_image, inputs=img_in, outputs=img_label)
 
         with gr.Column():
